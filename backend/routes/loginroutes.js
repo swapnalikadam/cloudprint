@@ -1,4 +1,4 @@
-var mysql      = require('mysql');
+var mysql = require('mysql');
 // var bcrypt = require('bcrypt');
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -23,12 +23,13 @@ exports.register = function(req,res){
    var users={
      "first_name":req.body.first_name,
      "last_name":req.body.last_name,
-     "email":req.body.email,
+     "userid":req.body.userid,
      "password":req.body.password,
+     "role":req.body.role,
      "created":today,
      "modified":today
    }
-   connection.query('INSERT INTO users SET ?',users, function (error, results, fields) {
+   connection.query('INSERT INTO collegeusers SET ?',users, function (error, results, fields) {
    if (error) {
      console.log("error ocurred",error);
      res.send({
@@ -49,9 +50,10 @@ exports.register = function(req,res){
 }
 
 exports.login = function(req,res){
-  var email= req.body.email;
+  var userid= req.body.userid;
   var password = req.body.password;
-  connection.query('SELECT * FROM users WHERE email = ?',[email], function (error, results, fields) {
+  var role = req.body.role;
+  connection.query('SELECT * FROM collegeusers WHERE userid = ?',[userid], function (error, results, fields) {
   if (error) {
     console.log("error ocurred",error);
     res.send({
@@ -59,13 +61,23 @@ exports.login = function(req,res){
       "failed":"error ocurred"
     })
   }else{
-    // console.log('The solution is: ', results);
+    console.log('The solution is: ', results);
     if(results.length >0){
       if(results[0].password == req.body.password){
-        res.send({
-          "code":200,
-          "success":"login sucessfull"
-        })
+        if(results[0].role == req.body.role){
+          global.username = req.body.userid;
+          res.send({
+            "code":200,
+            "success":"login sucessfull"
+          })
+        }
+        else{
+          res.send({
+            "code":204,
+            "success":"You have logged in from wrong user role"
+          })
+        }
+
       }
       else{
         res.send({
@@ -73,21 +85,7 @@ exports.login = function(req,res){
              "success":"Email and password does not match"
         })
       }
-    //   bcrypt.compare(password, results[0].password, function(err, doesMatch){
-    //     if (doesMatch){
-    //  //log him in
-    //  res.send({
-    //    "code":200,
-    //    "success":"login sucessfull"
-    //      });
-    //   }else{
-    //  //go away
-    //  res.send({
-    //    "code":204,
-    //    "success":"Email and password does not match"
-    //      });
-    //   }
-    // });
+
     }
     else{
       res.send({
