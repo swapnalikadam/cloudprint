@@ -35,7 +35,7 @@ class Loginscreen extends Component {
   }
   componentWillMount(){
     var loginscreen=[];
-    loginscreen.push(<Login parentContext={this} appContext={this.props.parentContext}/>);
+    loginscreen.push(<Login parentContext={this} appContext={this.props.appContext}/>);
     var loginmessage = "Not registered yet, Register Now";
     this.setState({
                   loginscreen:loginscreen,
@@ -47,7 +47,7 @@ class Loginscreen extends Component {
     var loginmessage;
     if(this.state.isLogin){
       var loginscreen=[];
-      loginscreen.push(<Register parentContext={this} appContext={this.props.parentContext} role={userRole}/>);
+      loginscreen.push(<Register parentContext={this} appContext={this.props.appContext} role={userRole}/>);
       loginmessage = "Already registered.Go to Login";
       var loginButtons=[];
       loginButtons.push(
@@ -82,7 +82,7 @@ class Loginscreen extends Component {
         </MuiThemeProvider>
         </div>
       )
-      loginscreen.push(<Login parentContext={this} appContext={this.props.parentContext} role={userRole}/>);
+      loginscreen.push(<Login parentContext={this} appContext={this.props.appContext} role={userRole}/>);
       loginmessage = "Not Registered yet.Go to registration";
       this.setState({
                      loginscreen:loginscreen,

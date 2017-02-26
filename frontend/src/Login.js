@@ -41,7 +41,7 @@ class Login extends Component {
     }
   }
   componentWillMount(){
-  console.log("willmount prop values",this.props);
+  // console.log("willmount prop values",this.props);
   if(this.props.role != undefined){
     if(this.props.role == 'student'){
       console.log("in student componentWillMount");
@@ -66,7 +66,7 @@ class Login extends Component {
          </div>
          </MuiThemeProvider>
       )
-      this.setState({menuValue:1,loginComponent:localloginComponent})
+      this.setState({menuValue:1,loginComponent:localloginComponent,loginRole:'student'})
     }
     else if(this.props.role == 'teacher'){
       console.log("in teacher componentWillMount");
@@ -91,7 +91,7 @@ class Login extends Component {
          </div>
          </MuiThemeProvider>
       )
-      this.setState({menuValue:2,loginComponent:localloginComponent})
+      this.setState({menuValue:2,loginComponent:localloginComponent,loginRole:'teacher'})
     }
   }
   }
@@ -108,12 +108,12 @@ class Login extends Component {
      if(response.data.code == 200){
        console.log("Login successfull");
        var uploadScreen=[];
-       uploadScreen.push(<UploadScreen appContext={self.props.appContext}/>)
+       uploadScreen.push(<UploadScreen appContext={self.props.appContext} role={self.state.loginRole}/>)
        self.props.appContext.setState({loginPage:[],uploadScreen:uploadScreen})
      }
      else if(response.data.code == 204){
        console.log("Username password do not match");
-       alert("username password do not match")
+       alert(response.data.success)
      }
      else{
        console.log("Username does not exists");

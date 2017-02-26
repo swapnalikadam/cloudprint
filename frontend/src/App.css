@@ -22,3 +22,14 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.customstyle{
+  top:6px;
+  left:10px;
+}
+
+.customdrawerstyle{
+  left:70px;
+  font-size: 25px;
+  top:4px;
+}

@@ -3,6 +3,8 @@ var path = require('path');
 var writePath='/home/swapnali/Documents/cloudprint2/filestobeprinted/';
 var cmd=require('node-cmd');
 var async = require('async');
+var jsonfile = require('jsonfile');
+
 exports.fileprint = function(req,res){
   // console.log("req",req.files);
   var filesArray = req.files;
@@ -29,16 +31,21 @@ exports.fileprint = function(req,res){
           });
         },
         function (arg1, callback) {
-          global.username = 'wq@gmail.com';
-              var swiftcommand= 'swift -A http://127.0.0.1:12345/auth/v1.0 -U test:tester -K testing upload --object-name ' +file.originalname+ ' '+global.username+' '+'../filestobeprinted/'+file.originalname;
+          var filepath = './userdata/userid.json'
+            jsonfile.readFile(filepath, function(err, obj) {
+              var userid = obj.userid;
+              // console.log("user id in read file",userid);
+              var swiftcommand= 'swift -A http://127.0.0.1:12345/auth/v1.0 -U test:tester -K testing upload --object-name ' +file.originalname+ ' '+userid+' '+'../filestobeprinted/'+file.originalname;
               // console.log("command",swiftcommand);
               cmd.get(
                 swiftcommand,
                 function(data){
                   console.log('the responses is : ',data)
+                  callback(null, 'done');
                 }
               );
-          callback(null, 'done');
+            })
+
         }
         ], function (err, result) {
           // result now equals 'done'

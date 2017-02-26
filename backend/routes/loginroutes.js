@@ -1,5 +1,6 @@
 var mysql = require('mysql');
 // var bcrypt = require('bcrypt');
+var jsonfile = require('jsonfile');
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
@@ -61,11 +62,17 @@ exports.login = function(req,res){
       "failed":"error ocurred"
     })
   }else{
-    console.log('The solution is: ', results);
+    console.log('The solution is: ', results[0].password,req.body.password,req.body.role);
     if(results.length >0){
       if(results[0].password == req.body.password){
         if(results[0].role == req.body.role){
-          global.username = req.body.userid;
+          var file = './userdata/userid.json'
+          var obj = {userid: req.body.userid}
+          jsonfile.writeFile(file, obj, function (err) {
+            if(err){
+              console.log("Error ocurred in writing json during login at login handler in login routes",err);
+            }
+          })
           res.send({
             "code":200,
             "success":"login sucessfull"

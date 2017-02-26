@@ -17,7 +17,7 @@ class App extends Component {
   }
   componentWillMount(){
     var loginPage =[];
-    loginPage.push(<LoginScreen parentContext={this}/>);
+    loginPage.push(<LoginScreen appContext={this}/>);
     this.setState({
                   loginPage:loginPage
                     })
