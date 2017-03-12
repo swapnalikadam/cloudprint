@@ -13,7 +13,10 @@
   padding: 20px;
   color: white;
 }
-
+.previousfilesContainer{
+  width:40%;
+  align-self: center;
+}
 .App-intro {
   font-size: large;
 }

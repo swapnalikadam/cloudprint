@@ -28,5 +28,6 @@ router.get('/', function(req, res) {
 router.post('/register',login.register);
 router.post('/login',login.login);
 router.post('/fileprint',multerupload.any(),upload.fileprint);
+router.get('/fileretrieve',upload.fileretrieve);
 app.use('/api', router);
 app.listen(4000);

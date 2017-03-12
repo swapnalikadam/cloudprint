@@ -4,7 +4,41 @@ var writePath='/home/swapnali/Documents/cloudprint2/filestobeprinted/';
 var cmd=require('node-cmd');
 var async = require('async');
 var jsonfile = require('jsonfile');
+exports.fileretrieve = function(req,res){
+  // console.log("retrieve hit");
+  // async.waterfall([
+  //   function(callback){
+      var filepath = './userdata/userid.json'
+        jsonfile.readFile(filepath, function(err, obj) {
+          var userid = obj.userid;
+          // console.log("user id in read file",userid);
+          var swiftcommand= 'swift -A http://127.0.0.1:12345/auth/v1.0 -U test:tester -K testing list '+userid;
+          // console.log("command",swiftcommand);
+          cmd.get(
+            swiftcommand,
+            function(data){
+              var filenames = data.split('\n');
+              var resfiles=[];
+              for(var i =0;i<filenames.length-1;i++){
+                resfiles.push(
+                  {name:filenames[i]}
+                )
+              }
 
+              // console.log('the responses is :',resfiles)
+              res.send({
+                "code":200,
+                "result":resfiles
+              })
+            }
+          );
+        });
+  //   }
+  //   ], function (err, result) {
+  //   // result now equals 'done'
+  //   // console.log("waterfall result",file.originalname);
+  // })
+}
 exports.fileprint = function(req,res){
   // console.log("req",req.files);
   var filesArray = req.files;
