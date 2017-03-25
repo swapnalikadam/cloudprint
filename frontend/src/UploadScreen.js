@@ -1,27 +1,29 @@
 import React, { Component } from 'react';
+import './App.css';
+/*
+Screen:LoginScreen
+Loginscreen is the main screen which the user is shown on first visit to page and after
+hitting logout
+*/
+import LoginScreen from './Loginscreen';
+/*
+Module:Material-UI
+Material-UI is used for designing ui of the app
+*/
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
 import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
-import {List, ListItem} from 'material-ui/List';
-import ActionInfo from 'material-ui/svg-icons/action/info';
-import Divider from 'material-ui/Divider';
-import Subheader from 'material-ui/Subheader';
-import Avatar from 'material-ui/Avatar';
-import FileFolder from 'material-ui/svg-icons/file/folder';
-import ActionAssignment from 'material-ui/svg-icons/action/assignment';
-import {blue500, yellow600,red500, greenA200} from 'material-ui/styles/colors';
-import EditorInsertChart from 'material-ui/svg-icons/editor/insert-chart';
-import Tree from 'react-file-tree';
-import Checkbox from 'material-ui/Checkbox';
-import './App.css';
-import Dropzone from 'react-dropzone';
 import FontIcon from 'material-ui/FontIcon';
-import LoginScreen from './Loginscreen';
+import {blue500, red500, greenA200} from 'material-ui/styles/colors';
 
 var apiBaseUrl = "http://localhost:4000/api/";
-
+/*
+Module:Dropzone
+Dropzone is used for local file selection
+*/
+import Dropzone from 'react-dropzone';
 /*
 Module:superagent
 superagent is used to handle post/get requests to server
@@ -38,14 +40,13 @@ class UploadScreen extends Component {
       draweropen:false,
       printcount:10,
       printingmessage:'',
-      printButtonDisabled:false,
-      fileprintingscreen:[],
-      previousfilesList:[]
+      printButtonDisabled:false
     }
   }
   componentWillMount(){
     // console.log("prop values",this.props.role);
     var printcount;
+    //set upload limit based on user role
     if(this.props.role){
       if(this.props.role == 'student'){
         printcount = 5;
@@ -54,31 +55,14 @@ class UploadScreen extends Component {
         printcount =10;
       }
     }
-    var fileprintingscreen=[];
-    fileprintingscreen.push(
-      <div>
-        <center>
-            <div>
-              You can print upto {this.state.printcount} files at a time since you are {this.state.role}
-            </div>
-
-            <Dropzone onDrop={(files) => this.onDrop(files)}>
-                  <div>Try dropping some files here, or click to select files to upload.</div>
-            </Dropzone>
-            <div>
-            Files to be printed are:
-            </div>
-        </center>
-        <div>
-            {this.state.printingmessage}
-        </div>
-        <MuiThemeProvider>
-             <RaisedButton disabled={this.state.printButtonDisabled} label="Print Files" primary={true} style={style} onClick={(event) => this.handleClick(event)}/>
-        </MuiThemeProvider>
-      </div>
-    )
-    this.setState({printcount,role:this.props.role,fileprintingscreen});
+    this.setState({printcount,role:this.props.role});
   }
+  /*
+  Function:handleCloseClick
+  Parameters: event,index
+  Usage:This fxn is used to remove file from filesPreview div
+  if user clicks close icon adjacent to selected file
+  */
   handleCloseClick(event,index){
     // console.log("filename",index);
     var filesToBeSent=this.state.filesToBeSent;
@@ -100,6 +84,12 @@ class UploadScreen extends Component {
     }
     this.setState({filesToBeSent,filesPreview});
   }
+  /*
+  Function:onDrop
+  Parameters: acceptedFiles, rejectedFiles
+  Usage:This fxn is default event handler of react drop-Dropzone
+  which is modified to update filesPreview div
+  */
   onDrop(acceptedFiles, rejectedFiles) {
       // console.log('Accepted files: ', acceptedFiles[0].name);
       var filesToBeSent=this.state.filesToBeSent;
@@ -128,6 +118,12 @@ class UploadScreen extends Component {
 
       // console.log('Rejected files: ', rejectedFiles);
 }
+/*
+  Function:handleClick
+  Parameters: event
+  Usage:This fxn is handler of submit button which is responsibel fo rhandling file uploads
+  to backend
+*/
 handleClick(event){
   // console.log("handleClick",event);
   this.setState({printingmessage:"Please wait until your files are being printed",printButtonDisabled:true})
@@ -153,97 +149,61 @@ handleClick(event){
     alert("Please upload some files first");
   }
 }
+/*
+  Function:toggleDrawer
+  Parameters: event
+  Usage:This fxn is used to toggle drawer state
+  */
 toggleDrawer(event){
   // console.log("drawer click");
   this.setState({draweropen: !this.state.draweropen})
 }
+/*
+  Function:toggleDrawer
+  Parameters: event
+  Usage:This fxn is used to close the drawer when user clicks anywhere on the
+  main div
+  */
 handleDivClick(event){
   // console.log("event",event);
   if(this.state.draweropen){
     this.setState({draweropen:false})
   }
 }
+/*
+  Function:handleLogout
+  Parameters: event
+  Usage:This fxn is used to end user session and redirect the user back to login page
+  */
 handleLogout(event){
   // console.log("logout event fired",this.props);
   var loginPage =[];
   loginPage.push(<LoginScreen appContext={this.props.appContext}/>);
   this.props.appContext.setState({loginPage:loginPage,uploadScreen:[]})
 }
-showpreviousFiles(event){
-  var self=this;
-  var req = request.get(apiBaseUrl + 'fileretrieve');
-  req.end(function (err,res){
-    if(err){
-     console.log("some error ");
-    }
-    else{
-      console.log("response from server",res.body);
-      if(res.body.code=="200"){
-        var filestobeDisplayed = res.body.result;
-        var filenamesDiv=[];
-        for(var i in filestobeDisplayed){
-          filenamesDiv.push(
-            <ListItem
-              rightAvatar={<Avatar icon={<ActionAssignment />} backgroundColor={blue500} />}
-              primaryText={filestobeDisplayed[i].name}
-              leftCheckbox={<Checkbox onClick={(event) => self.handleFileCheck(event,i)}/>}
-            />
-          )
-        }
-        var fileDivContainer=[];
-        fileDivContainer.push(
-          <div className="previousfilesContainer">
-          <MuiThemeProvider>
-          <List>
-      <Subheader inset={true}>Files</Subheader>
-        {filenamesDiv}
-    </List>
-          </MuiThemeProvider>
-          <MuiThemeProvider>
-               <RaisedButton disabled={self.state.printButtonDisabled} label="Print Files" primary={true} style={style} onClick={(event) => self.handlePreviousFilesClick(event)}/>
-          </MuiThemeProvider>
-          </div>
-        );
-        self.setState({fileprintingscreen:fileDivContainer,draweropen:false,previousfilesList:res.body.result});
-      }
-    }
-  })
-}
-handleFileCheck(event,index){
-  console.log("event of file check", index,this.state.previousfilesList);
-}
   render() {
     return (
       <div className="App">
-      <MuiThemeProvider>
-        <div>
-        <AppBar
-           title="Print Files"
-           onLeftIconButtonTouchTap={(event) => this.toggleDrawer(event)}
-         />
-         <Drawer open={this.state.draweropen}>
-         <div>
-         User Profile
-         <a href="#"><FontIcon
-           className="material-icons customdrawerstyle"
-           color={blue500}
-           styles={{ top:10,}}
-           onClick={(event) => this.toggleDrawer(event)}
-         >clear</FontIcon></a>
-         </div>
-         <MenuItem
-         onTouchTap={(event) => this.showpreviousFiles(event)}>Previous Files</MenuItem>
-         <MenuItem
-         onTouchTap={(event) => this.handleLogout(event)}>Logout</MenuItem>
-         </Drawer>
-         </div>
-      </MuiThemeProvider>
           <div onClick={(event) => this.handleDivClick(event)}>
           <center>
-          {this.state.filesPreview}
+          <div>
+            You can print upto {this.state.printcount} files at a time since you are {this.state.role}
+          </div>
 
-              {this.state.fileprintingscreen}
+          <Dropzone onDrop={(files) => this.onDrop(files)}>
+                <div>Try dropping some files here, or click to select files to upload.</div>
+          </Dropzone>
+          <div>
+          Files to be printed are:
+          {this.state.filesPreview}
+          </div>
           </center>
+          <div>
+          {this.state.printingmessage}
+          </div>
+      <MuiThemeProvider>
+           <RaisedButton disabled={this.state.printButtonDisabled} label="Print Files" primary={true} style={style} onClick={(event) => this.handleClick(event)}/>
+      </MuiThemeProvider>
           </div>
           </div>
     );

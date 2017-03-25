@@ -75,11 +75,19 @@ exports.fileprint = function(req,res){
                 swiftcommand,
                 function(data){
                   console.log('the responses is : ',data)
-                  callback(null, 'done');
+                  callback(null, 'done storingto swift');
                 }
               );
             })
 
+        },
+        function(arg2,callback){
+          console.log("callback recieved",arg1);
+          //run printing commands here
+          cmd.get('ls',
+                  function(data){
+                    callback(null,"done printing files");
+                  })
         }
         ], function (err, result) {
           // result now equals 'done'
@@ -100,4 +108,43 @@ exports.fileprint = function(req,res){
           }
           });
 
+}
+
+exports.pastFilesPrint = function(req,res){
+  console.log("pastFilesPrint request",req.body.filesArray);
+  async.each(req.body.filesArray, function(file,eachcallback){
+    console.log("files",file);
+    async.waterfall([
+      function(callback){
+        fs.readFile(writePath +file.name, (err, data) => {
+          if (err) {
+            console.log("err ocurred in reading files from past files", err);
+            }
+          else {
+            // console.log("data from file",data);
+            callback(null,data);
+          }
+          });
+      }
+    ], function (err, result) {
+      // result now equals 'done'
+      console.log("waterfall result");
+      eachcallback()
+    });
+
+  }, function(err){
+    if(err){
+      console.log("some error oucrred");
+    }
+    else{
+      console.log("finished");
+    }
+  // if any of the saves produced an error, err would equal that error
+});
+
+
+  res.send({
+    "code":"200",
+    "success":"filesprintedsucessfully"
+  })
 }

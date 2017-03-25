@@ -8,6 +8,7 @@ import MenuItem from 'material-ui/MenuItem';
 var apiBaseUrl = "http://localhost:4000/api/";
 import axios from 'axios';
 import UploadScreen from './UploadScreen';
+import UploadPage from './UploadPage';
 class Login extends Component {
   constructor(props){
     super(props);
@@ -108,7 +109,7 @@ class Login extends Component {
      if(response.data.code == 200){
        console.log("Login successfull");
        var uploadScreen=[];
-       uploadScreen.push(<UploadScreen appContext={self.props.appContext} role={self.state.loginRole}/>)
+       uploadScreen.push(<UploadPage appContext={self.props.appContext} role={self.state.loginRole}/>)
        self.props.appContext.setState({loginPage:[],uploadScreen:uploadScreen})
      }
      else if(response.data.code == 204){
