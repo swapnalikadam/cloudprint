@@ -82,9 +82,9 @@ exports.fileprint = function(req,res){
 
         },
         function(arg2,callback){
-          console.log("callback recieved",arg1);
+          // console.log("callback recieved",arg2);
           //run printing commands here
-          cmd.get('ls',
+          cmd.get('lpr '+writePath + file.originalname,
                   function(data){
                     callback(null,"done printing files");
                   })
@@ -125,6 +125,12 @@ exports.pastFilesPrint = function(req,res){
             callback(null,data);
           }
           });
+      },
+      function(arg1,callback){
+        cmd.get('lpr '+writePath+file.name,
+                function(data){
+                  callback(null,"done printing files");
+                })
       }
     ], function (err, result) {
       // result now equals 'done'

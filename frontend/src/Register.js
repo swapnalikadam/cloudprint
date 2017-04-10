@@ -25,34 +25,41 @@ class Register extends Component {
     var self = this;
     //To be done:check for empty values before hitting submit
     if(this.state.first_name.length>0 && this.state.last_name.length>0 && this.state.email.length>0 && this.state.password.length>0){
-      var payload={
-      "first_name": this.state.first_name,
-      "last_name":this.state.last_name,
-      "userid":this.state.email,
-      "password":this.state.password,
-      "role":role
+      // console.log("values",/^[a-zA-Z0-9]+$/.test(this.state.first_name));
+      if(/^[a-zA-Z0-9]+$/.test(this.state.first_name) && /^[a-zA-Z0-9]+$/.test(this.state.last_name)){
+        var payload={
+        "first_name": this.state.first_name,
+        "last_name":this.state.last_name,
+        "userid":this.state.email,
+        "password":this.state.password,
+        "role":role
+        }
+        axios.post(apiBaseUrl+'/register', payload)
+       .then(function (response) {
+        //  console.log(response);
+         if(response.data.code == 200){
+          //  console.log("registration successfull");
+           var loginscreen=[];
+           loginscreen.push(<Login parentContext={this} appContext={self.props.appContext} role={role}/>);
+           var loginmessage = "Not Registered yet.Go to registration";
+           self.props.parentContext.setState({loginscreen:loginscreen,
+           loginmessage:loginmessage,
+           buttonLabel:"Register",
+           isLogin:true
+            });
+         }
+         else{
+           console.log("some error ocurred",response.data.code);
+         }
+       })
+       .catch(function (error) {
+         console.log(error);
+       });
       }
-      axios.post(apiBaseUrl+'/register', payload)
-     .then(function (response) {
-       console.log(response);
-       if(response.data.code == 200){
-        //  console.log("registration successfull");
-         var loginscreen=[];
-         loginscreen.push(<Login parentContext={this} appContext={self.props.appContext} role={role}/>);
-         var loginmessage = "Not Registered yet.Go to registration";
-         self.props.parentContext.setState({loginscreen:loginscreen,
-         loginmessage:loginmessage,
-         buttonLabel:"Register",
-         isLogin:true
-          });
-       }
-       else{
-         console.log("some error ocurred",response.data.code);
-       }
-     })
-     .catch(function (error) {
-       console.log(error);
-     });
+      else{
+        alert("Name fields should contain alphanumeric characters only")
+      }
+
     }
     else{
       alert("Input field value is missing");
@@ -80,6 +87,7 @@ class Register extends Component {
            <TextField
              hintText="Enter your First Name"
              floatingLabelText="First Name"
+             pattern="^[a-zA-Z][a-zA-Z0-9-_\.]{5,12}$"
              onChange = {(event,newValue) => this.setState({first_name:newValue})}
              />
            <br/>

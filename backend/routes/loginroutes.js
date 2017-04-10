@@ -8,6 +8,23 @@ var connection = mysql.createConnection({
   database : 'cloudprint',
   insecureAuth: false
 });
+var crypto = require('crypto'),
+    algorithm = 'aes-256-ctr',
+    password = 'd6F3Efeq';
+
+function encrypt(text){
+  var cipher = crypto.createCipher(algorithm,password)
+  var crypted = cipher.update(text,'utf8','hex')
+  crypted += cipher.final('hex');
+  return crypted;
+}
+
+function decrypt(text){
+  var decipher = crypto.createDecipher(algorithm,password)
+  var dec = decipher.update(text,'hex','utf8')
+  dec += decipher.final('utf8');
+  return dec;
+}
 connection.connect(function(err){
 if(!err) {
     console.log("Database is connected ... nn");
@@ -25,7 +42,7 @@ exports.register = function(req,res){
      "first_name":req.body.first_name,
      "last_name":req.body.last_name,
      "userid":req.body.userid,
-     "password":req.body.password,
+     "password":encrypt(req.body.password),
      "role":req.body.role,
      "created":today,
      "modified":today
@@ -62,9 +79,9 @@ exports.login = function(req,res){
       "failed":"error ocurred"
     })
   }else{
-    console.log('The solution is: ', results[0].password,req.body.password,req.body.role);
+    // console.log('The solution is: ', results[0].password,req.body.password,req.body.role);
     if(results.length >0){
-      if(results[0].password == req.body.password){
+      if(decrypt(results[0].password) == req.body.password){
         if(results[0].role == req.body.role){
           var file = './userdata/userid.json'
           var obj = {userid: req.body.userid}

@@ -53,6 +53,7 @@ class Login extends Component {
            <TextField
              hintText="Enter your College Rollno"
              floatingLabelText="Student Id"
+             pattern="[a-zA-Z0-9_-]{4,10}"
              onChange = {(event,newValue) => this.setState({username:newValue})}
              />
            <br/>
